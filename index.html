@@ -1,0 +1,1118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Engineering — MCQ Prep</title>
+<meta name="color-scheme" content="light dark" />
+<style>
+  :root{
+    --bg:#0b0c10;
+    --panel:#111218;
+    --card:#161821;
+    --text:#e8ecf1;
+    --muted:#b7c1cd;
+    --accent:#4f8cff;
+    --accent-2:#00c1a2;
+    --warn:#ffb020;
+    --danger:#ff5c61;
+    --ok:#18c37e;
+    --border:#232636;
+    --focus:#9bc1ff;
+    --pill-pass:#0c7a43;
+    --pill-fail:#8d1f1f;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f7f8fb; --panel:#ffffff; --card:#ffffff; --text:#0d1117; --muted:#4b5563; --border:#e5e7eb;
+      --accent:#2563eb; --accent-2:#059669; --warn:#d97706; --danger:#dc2626; --ok:#059669; --focus:#93c5fd;
+      --pill-pass:#16a34a; --pill-fail:#b91c1c;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial,"Apple Color Emoji","Segoe UI Emoji";
+    background:var(--bg); color:var(--text); line-height:1.45;
+  }
+  header{
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    padding:1rem 1.25rem; background:var(--panel); border-bottom:1px solid var(--border);
+    position:sticky; top:0; z-index:10;
+  }
+  header h1{font-size:1.05rem; margin:0; letter-spacing:.2px;}
+  header .meta{font-size:.9rem; color:var(--muted)}
+  .wrap{display:grid; grid-template-columns: 320px 1fr; gap:1rem; padding:1rem; align-items:start;}
+  aside{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:1rem; position:sticky; top:4.75rem;
+  }
+  /* Independent scrolling for the controls column (desktop/tablet) */
+@media (min-width: 981px){
+  aside{
+    /* already sticky with top:4.75rem in your file */
+    display: flex;
+    flex-direction: column;
+  }
+  .controls{
+    /* height of visible area below the sticky header */
+    max-height: calc(100vh - 4.75rem - 2rem); /* subtract top offset + breathing room */
+    overflow: auto;            /* ← creates the second scrollbar */
+    overscroll-behavior: contain;
+    padding-right: .25rem;     /* avoid scrollbar overlapping text */
+  }
+}
+
+/* (Optional) nice, unobtrusive scrollbar styling */
+.controls::-webkit-scrollbar{ width:10px }
+.controls::-webkit-scrollbar-thumb{
+  background: color-mix(in oklab, var(--muted) 45%, transparent);
+  border-radius: 8px;
+  border: 2px solid transparent;
+}
+.controls{ scrollbar-width: thin; scrollbar-color: color-mix(in oklab, var(--muted) 45%, transparent) transparent; }
+
+  .controls h2{font-size:1rem; margin:.25rem 0 .75rem}
+  .control{display:flex; align-items:center; gap:.5rem; margin:.4rem 0;}
+  .control input[type=checkbox]{width:1.05rem; height:1.05rem;}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:.4rem;
+    padding:.55rem .8rem; border-radius:10px; border:1px solid var(--border); background:var(--card);
+    color:var(--text); cursor:pointer; user-select:none; text-decoration:none; font-weight:600; font-size:.95rem;
+  }
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent); color:white; border-color:transparent}
+  .btn.ghost{background:transparent}
+  .btn.warn{background:var(--warn); color:#111}
+  .btn.ok{background:var(--ok); color:#08130d}
+  .btn.danger{background:var(--danger); color:white}
+  .btn-row{display:flex; flex-wrap:wrap; gap:.5rem; margin:.75rem 0;}
+  .grid{
+    display:grid; grid-template-columns:repeat(8, 1fr); gap:.35rem; margin-top:.5rem;
+  }
+  .grid button{
+    border:1px solid var(--border); background:var(--card); color:var(--text); border-radius:8px; padding:.45rem 0; cursor:pointer;
+    font-weight:600;
+  }
+  .grid button.unanswered{opacity:.7}
+  .grid button.answered{outline:1px dashed var(--muted)}
+  .grid button.correct{background:color-mix(in oklab, var(--ok) 15%, var(--card)); border-color:var(--ok)}
+  .grid button.wrong{background:color-mix(in oklab, var(--danger) 18%, var(--card)); border-color:var(--danger)}
+  .score{
+    margin-top:1rem; padding:.75rem; border-radius:10px; border:1px solid var(--border); background:var(--card); display:flex; justify-content:space-between; align-items:center;
+  }
+  .pill{padding:.25rem .55rem; border-radius:999px; font-weight:700; color:white; font-size:.85rem;}
+  .pill.pass{background:var(--pill-pass)}
+  .pill.fail{background:var(--pill-fail)}
+  main{
+    min-height:60vh;
+  }
+  .q-card{
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1rem; margin-bottom:1rem;
+  }
+  .q-head{display:flex; justify-content:space-between; align-items:center; gap:.75rem; margin-bottom:.5rem}
+  .q-title{font-weight:700}
+  .tags{display:flex; gap:.4rem; flex-wrap:wrap}
+  .tag{font-size:.8rem; color:var(--muted); border:1px solid var(--border); padding:.1rem .4rem; border-radius:999px}
+  fieldset{border:none; margin:0; padding:0}
+  .choices{display:grid; gap:.5rem; margin:.5rem 0}
+  .choice{
+    display:flex; gap:.6rem; align-items:flex-start; padding:.45rem .6rem; border:1px solid var(--border); border-radius:10px; background:transparent;
+  }
+  .choice.correct{border-color:var(--ok); background:color-mix(in oklab, var(--ok) 12%, transparent)}
+  .choice.wrong{border-color:var(--danger); background:color-mix(in oklab, var(--danger) 12%, transparent)}
+  .choice.selected{outline:2px solid var(--focus)}
+  .feedback{margin-top:.5rem; padding:.55rem .7rem; border-radius:10px; background:color-mix(in oklab, var(--accent) 12%, transparent); border:1px dashed var(--accent)}
+  .feedback.ok{background:color-mix(in oklab, var(--ok) 12%, transparent); border-color:var(--ok)}
+  .feedback.bad{background:color-mix(in oklab, var(--danger) 12%, transparent); border-color:var(--danger)}
+  label{cursor:pointer}
+  input[type=radio], input[type=checkbox]{margin-top:.2rem}
+  input[type=text], select{
+    width:100%; padding:.55rem .6rem; border-radius:10px; border:1px solid var(--border); background:var(--panel); color:var(--text);
+  }
+  input[type=text]:focus, select:focus, .grid button:focus, .btn:focus{outline:3px solid var(--focus); outline-offset:2px}
+  .sr-only{position:absolute !important; width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+  .row{display:grid; gap:.5rem}
+  .match-row{display:grid; grid-template-columns:1fr minmax(160px, 1fr); gap:.6rem; align-items:center}
+  .muted{color:var(--muted)}
+  footer{padding:1rem; text-align:center; color:var(--muted)}
+  @media (max-width: 980px){ .wrap{grid-template-columns:1fr} aside{position:static} .grid{grid-template-columns:repeat(10,1fr)} }
+</style>
+
+<!-- MathJax v3 configuration (tex-svg). Supports inline $, \( \) and display $$, \[ \]. -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true
+    },
+    svg: { fontCache: 'local' },
+    options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code','annotation','annotation-xml'] }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.min.js"></script>
+</head>
+<body>
+<header aria-label="App header">
+  <h1>Engineering Exam Prep — Interactive MCQs</h1>
+  <div class="meta" id="metaInfo" aria-live="polite">Ready</div>
+</header>
+
+<div class="wrap" id="appRoot">
+  <aside aria-label="Controls & navigation">
+    <p class="muted" style="margin-top:.75rem">
+        Shortcuts: <kbd>S</kbd> submit, <kbd>R</kbd> reset, <kbd>J</kbd> next unanswered, <kbd>I</kbd> import (paste).
+      </p>
+    <div class="controls">
+      <h2>Controls</h2>
+      <div class="control"><input id="chkShuffle" type="checkbox" /><label for="chkShuffle">Shuffle questions</label></div>
+      <div class="control"><input id="chkInstant" type="checkbox" /><label for="chkInstant">Instant feedback</label></div>
+      <div class="control"><input id="chkShowCorrect" type="checkbox" /><label for="chkShowCorrect">Show correct answers after submit</label></div>
+      <div class="control"><input id="chkAutosave" type="checkbox" checked /><label for="chkAutosave">Auto-save progress to localStorage</label></div>
+
+      <div class="btn-row" role="group" aria-label="Primary actions">
+        <button class="btn primary" id="btnStart">Start / Reset (R)</button>
+        <button class="btn ok" id="btnSubmit">Submit All (S)</button>
+        <button class="btn" id="btnSave">Save</button>
+        <button class="btn" id="btnLoad">Load</button>
+      </div>
+
+      <div class="btn-row" role="group" aria-label="Import & Export">
+        <button class="btn" id="btnExport">Export Attempt</button>
+        <label class="btn ghost" for="fileImport" id="lblFileImport">Import .json</label>
+        <input id="fileImport" class="sr-only" type="file" accept=".json,application/json" />
+        <button class="btn ghost" id="btnPaste">Paste JSON (I)</button>
+      </div>
+
+      <div class="score" aria-live="polite">
+        <div>
+          <div><strong>Score:</strong> <span id="scoreRaw">0/0</span></div>
+          <div class="muted"><span id="scorePct">0%</span></div>
+        </div>
+        <div class="pill" id="pillPF" aria-label="Pass/Fail">—</div>
+      </div>
+
+      <h2 style="margin-top:1rem">Jump to Question</h2>
+      <div class="grid" id="jumpGrid" role="navigation" aria-label="Jump grid"></div>
+
+    </div>
+  </aside>
+
+  <main id="main" aria-label="Question list">
+    <!-- Question cards render here -->
+  </main>
+</div>
+
+<footer>
+  Works offline. Only external dependency: MathJax CDN. All question text is inserted as text nodes to avoid HTML injection; MathJax then parses TeX delimiters.
+</footer>
+
+<script>
+'use strict';
+
+/* ===========================
+   DEFAULT QUESTION BANK
+   =========================== */
+const QUESTION_BANK = [
+  {"id":1,"type":"tf","prompt":"The finite volume method (FVM) solves the governing equations in their differential form.","options":["True","False"],"correct":[1],"feedback":"FVM solves the integral form of the governing equations for each control volume."},
+  {"id":2,"type":"mc","prompt":"Which conservation equations are inherently satisfied by the finite volume method?","options":["Mass only","Momentum only","Energy only","Mass, momentum, and energy"],"correct":[3],"feedback":"FVM enforces conservation of all fundamental quantities by integrating over each control volume."},
+  {"id":3,"type":"tf","prompt":"FVM control volumes are restricted to structured hexahedral shapes only.","options":["True","False"],"correct":[1],"feedback":"FVM supports arbitrary cell shapes; conservation is face-based, not geometry-dependent."},
+  {"id":4,"type":"mc","prompt":"Why is FVM preferred over FEM for high-speed or turbulent flow simulations?","options":["Better memory and speed scaling","Exact analytical solution","Lower mathematical order","Automatic mesh refinement"],"correct":[0],"feedback":"FVM efficiently handles large, source-term-dominated problems with reduced memory use."},
+  {"id":5,"type":"tf","prompt":"In FVM, each governing equation is applied to a single infinitesimal fluid particle.","options":["True","False"],"correct":[1],"feedback":"FVM applies equations to finite control volumes, not infinitesimal particles."},
+  {"id":6,"type":"mc","prompt":"In the example 2-D channel flow problem, which quantities are solved for?","options":["$u,v,p$","$u,v,T$","$p,T,\\rho$","$u,v,\\rho$"],"correct":[0],"feedback":"Velocity components and pressure are the primary unknowns for incompressible flow."},
+  {"id":7,"type":"tf","prompt":"No-slip wall boundaries imply zero tangential velocity at the wall.","options":["True","False"],"correct":[0],"feedback":"No-slip means the fluid velocity equals the wall velocity—zero for stationary walls."},
+  {"id":8,"type":"mc","prompt":"Which boundary conditions are typical for the channel-flow FVM example?","options":["Specified velocity inlet and outlet pressure","Specified outlet velocity and inlet pressure","Free-slip walls","Periodic inlet/outlet"],"correct":[0],"feedback":"A velocity inlet and pressure outlet define the driven laminar channel problem."},
+  {"id":9,"type":"tf","prompt":"Discretisation converts PDEs into a finite set of algebraic equations.","options":["True","False"],"correct":[0],"feedback":"Discretisation replaces continuous functions with discrete cell-centred values."},
+  {"id":10,"type":"mc","prompt":"In a cell-centred finite volume scheme, primary variables are stored at:","options":["Vertices","Cell centres","Face midpoints","Boundary nodes"],"correct":[1],"feedback":"ANSYS Fluent and similar solvers store variables at cell centres for balance equations."},
+  {"id":11,"type":"tf","prompt":"Each algebraic equation in FVM typically links a cell to all other cells in the mesh.","options":["True","False"],"correct":[1],"feedback":"Each equation couples a cell only to its immediate neighbours through shared faces."},
+  {"id":12,"type":"mc","prompt":"Which theorem underpins conversion from volume to surface integrals in FVM?","options":["Green’s theorem","Divergence (Gauss) theorem","Stokes’ theorem","Fourier’s law"],"correct":[1],"feedback":"The Gauss divergence theorem transforms volume integrals into surface flux integrals."},
+  {"id":13,"type":"mc","prompt":"During discretisation, face-centred velocities are commonly obtained by:","options":["Averaging neighbouring cell-centre values","Integrating analytically","Extrapolating from inlet","Random sampling"],"correct":[0],"feedback":"Linear interpolation or averaging between adjacent cell centres estimates face values."},
+  {"id":14,"type":"tf","prompt":"Interpolation across cell faces introduces no numerical error.","options":["True","False"],"correct":[1],"feedback":"Interpolation and averaging are approximations introducing discretisation error."},
+  {"id":15,"type":"mc","prompt":"Which of the following reduces discretisation error?","options":["Coarser mesh","Smaller control volumes","Ignoring boundary layers","Larger time steps"],"correct":[1],"feedback":"Refining the mesh (smaller cells) decreases interpolation and truncation errors."},
+  {"id":16,"type":"tf","prompt":"Flux conservation across shared faces ensures automatic global conservation.","options":["True","False"],"correct":[0],"feedback":"Flux leaving one control volume enters its neighbour, enforcing global conservation."},
+  {"id":17,"type":"mc","prompt":"Non-linear terms in the algebraic FVM equations arise from:","options":["Source terms","Products of unknowns","Boundary conditions","Time derivatives only"],"correct":[1],"feedback":"Terms like $(\\mathbf{v}\\cdot\\nabla)\\mathbf{v}$ produce products of unknowns, causing non-linearity."},
+  {"id":18,"type":"tf","prompt":"The convective momentum term $\\rho\\mathbf{v}\\mathbf{v}$ is linear in velocity.","options":["True","False"],"correct":[1],"feedback":"It contains products of velocity components, making the momentum equations non-linear."},
+  {"id":19,"type":"mc","prompt":"Which technique is used to handle non-linear algebraic systems in FVM solvers?","options":["Direct inversion","Iterative linearisation","Laplace transform","Random search"],"correct":[1],"feedback":"Non-linear equations are linearised about guess values and solved iteratively."},
+  {"id":20,"type":"tf","prompt":"Linearisation reduces a non-linear term to a first-order Taylor-series approximation.","options":["True","False"],"correct":[0],"feedback":"Neglecting higher-order terms yields a linear relation valid near the guessed solution."},
+  {"id":21,"type":"mc","prompt":"The general transport equation in conservative form contains which four physical processes?","options":["Convection, diffusion, reaction, source","Transient, convection, diffusion, source","Production, decay, diffusion, flux","Advection only"],"correct":[1],"feedback":"It combines transient, convective, diffusive, and source contributions."},
+  {"id":22,"type":"tf","prompt":"In the integral transport equation, the diffusion term always acts to increase gradients.","options":["True","False"],"correct":[1],"feedback":"Diffusion acts to diminish gradients by spreading scalar quantities."},
+  {"id":23,"type":"mc","prompt":"Applying the divergence theorem converts which term in the transport equation?","options":["Volume diffusion term","Surface flux term to volume form","Volume divergence term to surface flux form","Source term to time derivative"],"correct":[2],"feedback":"The divergence theorem converts volume integrals of divergences to surface flux integrals."},
+  {"id":24,"type":"matching","prompt":"Match each term to its physical meaning in the transport equation.","matching":{"left":["$\\dfrac{\\partial (\\rho \\phi)}{\\partial t}$","$\\nabla\\cdot(\\rho\\phi\\mathbf{v})$","$\\nabla\\cdot(\\Gamma\\nabla\\phi)$","$S_{\\phi}$"],"right":["Diffusion","Transient accumulation","Source/sink","Convection"],"answers":[1,3,0,2]},"feedback":"Each term corresponds to transient, convective, diffusive, and source effects respectively."},
+  {"id":25,"type":"tf","prompt":"After spatial discretisation, the general transport equation becomes a set of algebraic equations.","options":["True","False"],"correct":[0],"feedback":"Discretisation replaces derivatives with flux balances at discrete cell centres."},
+  {"id":26,"type":"mc","prompt":"The generic discretised equation $a_P\\phi_P=\\sum a_{nb}\\phi_{nb}+b$ relates:","options":["Face and edge quantities","Cell centre and its neighbours","Boundary and interior nodes","Fluxes only"],"correct":[1],"feedback":"Each algebraic equation links a control-volume centre with its immediate neighbours."},
+  {"id":27,"type":"tf","prompt":"Matrices resulting from FVM discretisation are typically sparse.","options":["True","False"],"correct":[0],"feedback":"Only neighbouring cells contribute to each equation, yielding sparse matrices."},
+  {"id":28,"type":"mc","prompt":"The iterative update formula $\\phi_P^{\\text{new,used}}=\\phi_P^{\\text{old}}+U(\\phi_P^{\\text{new,predicted}}-\\phi_P^{\\text{old}})$ introduces:","options":["Over-relaxation factor","Damping or relaxation factor","Correction tolerance","Residual scaling"],"correct":[1],"feedback":"The relaxation factor $U$ controls how much of the new prediction is applied per iteration."},
+  {"id":29,"type":"tf","prompt":"Under-relaxation ($U<1$) typically stabilises but slows convergence.","options":["True","False"],"correct":[0],"feedback":"Lower $U$ dampens oscillations, improving stability at the cost of speed."},
+  {"id":30,"type":"tf","prompt":"Over-relaxation ($U>1$) is commonly used in CFD for added stability.","options":["True","False"],"correct":[1],"feedback":"Over-relaxation can accelerate convergence but usually decreases stability."},
+  {"id":31,"type":"mc","prompt":"Convergence in FVM iterations is judged when:","options":["Residuals reach zero exactly","Residuals and monitored quantities stop changing","Number of iterations equals grid cells","Mass is no longer conserved"],"correct":[1],"feedback":"Convergence occurs when residuals and flow variables no longer vary with iteration."},
+  {"id":32,"type":"numeric","prompt":"If residuals drop from $10^{-1}$ to $10^{-4}$, by what factor have they decreased? (±10%)","numeric":{"answer":1000,"tol":100},"feedback":"Residuals decreased by three orders of magnitude: a factor of $10^3$."},
+  {"id":33,"type":"mc","prompt":"Scaled residuals are obtained by dividing each residual by:","options":["The initial residual","The local property value","The maximum global residual","The relaxation factor"],"correct":[1],"feedback":"Scaling normalises residuals relative to the magnitude of the dependent variable."},
+  {"id":34,"type":"tf","prompt":"Low residuals always guarantee a physically correct CFD solution.","options":["True","False"],"correct":[1],"feedback":"Residuals indicate algebraic balance, not necessarily physical accuracy."},
+  {"id":35,"type":"multi","prompt":"Which quantities are good to monitor for convergence besides residuals?","options":["Lift or drag forces","Mass imbalance","Torque","Wall temperature"],"correct":[0,1,2,3],"feedback":"Monitoring integral forces and key field variables complements residual tracking."},
+  {"id":36,"type":"tf","prompt":"Initial conditions affect only the convergence path, not the final steady-state solution.","options":["True","False"],"correct":[0],"feedback":"For steady problems, different initial guesses converge to the same solution if stable."},
+  {"id":37,"type":"mc","prompt":"A good strategy for complex unsteady flows is to:","options":["Run directly unsteady from zero field","Use steady simulation first for initialisation","Increase relaxation factors above one","Disable residual monitoring"],"correct":[1],"feedback":"A steady precursor run provides a useful initial field for transient calculations."},
+  {"id":38,"type":"tf","prompt":"Round-off errors arise from finite numerical precision in computers.","options":["True","False"],"correct":[0],"feedback":"Finite precision arithmetic introduces small round-off errors in all computations."},
+  {"id":39,"type":"mc","prompt":"Which error type represents the difference between a converged numerical solution and the exact analytical solution on the same grid?","options":["Iteration error","Round-off error","Discretisation error","Model error"],"correct":[2],"feedback":"Discretisation (solution) error stems from spatial and temporal approximation."},
+  {"id":40,"type":"mc","prompt":"Model errors arise from:","options":["Simplified governing equations or assumptions","Poor mesh quality","Too few iterations","Precision limits"],"correct":[0],"feedback":"Model error reflects limitations of the physical or mathematical model itself."},
+  {"id":41,"type":"tf","prompt":"Systematic errors can remain even if numerical and model errors are negligible.","options":["True","False"],"correct":[0],"feedback":"Systematic discrepancies may persist due to measurement or boundary uncertainties."},
+  {"id":42,"type":"mc","prompt":"Which error decreases with mesh refinement?","options":["Round-off","Iteration","Discretisation","Model"],"correct":[2],"feedback":"Discretisation error diminishes as cell size and time step decrease."},
+  {"id":43,"type":"mc","prompt":"Residual $R_p$ at cell $p$ is given by:","options":["$R_p=a_p\\phi_P-\\sum a_{nb}\\phi_{nb}-b$","$R_p=\\phi_P-\\phi_{nb}$","$R_p=\\sum a_{nb}\\phi_{nb}$","$R_p=b$"],"correct":[0],"feedback":"Residual measures imbalance of the discretised algebraic equation at a cell."},
+  {"id":44,"type":"mc","prompt":"Normalized residuals are computed by dividing each residual by:","options":["Maximum residual ever found","Cell volume","Time step","Relaxation factor"],"correct":[0],"feedback":"Normalization uses the maximum residual magnitude for relative comparison."},
+  {"id":45,"type":"tf","prompt":"Higher-order discretisation schemes usually yield higher residuals than first-order schemes.","options":["True","False"],"correct":[0],"feedback":"High-order schemes tighten local balances, often producing larger residual magnitudes."},
+  {"id":46,"type":"mc","prompt":"Which term in the FVM balance ensures conservation at each cell interface?","options":["Diffusive flux","Convective flux","Surface flux continuity","Source term"],"correct":[2],"feedback":"Flux continuity across faces enforces conservation between adjacent control volumes."},
+  {"id":47,"type":"multi","prompt":"Select all common sources of numerical error in FVM.","options":["Round-off","Iteration","Discretisation","Model"],"correct":[0,1,2,3],"feedback":"All listed error types can contribute to total numerical uncertainty."},
+  {"id":48,"type":"mc","prompt":"Under what condition are mass, momentum, and energy balances considered satisfied?","options":["When residuals fall below tolerance","When fluxes vanish","When relaxation factors are unity","When all variables equal initial guesses"],"correct":[0],"feedback":"Residual criteria define when discrete conservation equations are satisfied."},
+  {"id":49,"type":"tf","prompt":"A sparse coefficient matrix from FVM discretisation typically contains many zero entries.","options":["True","False"],"correct":[0],"feedback":"Only neighbour interactions produce non-zero coefficients, yielding sparse matrices."},
+  {"id":50,"type":"mc","prompt":"Which statement best summarises the FVM?","options":["It approximates differential equations at points","It applies integral conservation to finite volumes","It ignores boundary conditions","It computes exact analytical solutions"],"correct":[1],"feedback":"FVM enforces conservation laws on discrete control volumes using flux balances."},
+  {"id":51,"type":"tf","prompt":"In the finite volume method, interpolation schemes are used to estimate variable values at cell faces from known cell-centre values.","options":["True","False"],"correct":[0],"feedback":"Interpolation provides the necessary face values for flux evaluation between adjacent control volumes."},
+{"id":52,"type":"mc","prompt":"Which of the following interpolation schemes is the simplest and most diffusive?","options":["First-order upwind","Second-order upwind","Central differencing","QUICK"],"correct":[0],"feedback":"The first-order upwind scheme assumes the face value equals that of the upstream cell, providing stability at the expense of accuracy."},
+{"id":53,"type":"tf","prompt":"In first-order upwind interpolation, the value at the cell face depends solely on the direction of the mass flux.","options":["True","False"],"correct":[0],"feedback":"Upwind schemes use the value from the upstream cell determined by the flow direction."},
+{"id":54,"type":"mc","prompt":"For the first-order upwind scheme, if the mass flux $\\dot{m}_e > 0$, which face value is used?","options":["$\\phi_E$","$\\phi_P$","$\\phi_W$","Average of $\\phi_P$ and $\\phi_E$"],"correct":[1],"feedback":"When the flow moves from $P$ toward $E$, the face value equals $\\phi_P$."},
+{"id":55,"type":"tf","prompt":"The first-order upwind scheme is second-order accurate in space.","options":["True","False"],"correct":[1],"feedback":"It is only first-order accurate because it neglects spatial variation across the cell."},
+{"id":56,"type":"mc","prompt":"Which characteristic best describes the first-order upwind scheme?","options":["Unstable and accurate","Stable and dissipative","Unbounded and oscillatory","Unstable and dispersive"],"correct":[1],"feedback":"It is very stable but highly diffusive, smoothing gradients and sharp features."},
+{"id":57,"type":"mc","prompt":"The second-order upwind scheme improves accuracy by including which additional information?","options":["Time derivative","Neighbouring face temperature","Gradient of $\\phi$ at the upstream cell","Downstream pressure"],"correct":[2],"feedback":"The face value is extrapolated using the cell-centre gradient, increasing spatial accuracy."},
+{"id":58,"type":"tf","prompt":"Gradient limiters are unnecessary in second-order upwind schemes.","options":["True","False"],"correct":[1],"feedback":"Gradient limiters are often required to prevent overshooting or undershooting in regions of steep gradients."},
+{"id":59,"type":"mc","prompt":"In the second-order upwind scheme, what determines whether the extrapolation is taken from cell $P$ or $E$?","options":["Magnitude of $\\nabla \\phi$","Sign of $\\dot{m}_e$","Peclet number","Time step"],"correct":[1],"feedback":"The face value is based on the upstream cell identified by the direction of mass flux $\\dot{m}_e$."},
+{"id":60,"type":"mc","prompt":"Which term in the expression $\\phi_e = \\phi_P + \\varphi \\nabla\\phi_P \\cdot \\mathbf{r}$ controls the limiting of gradients?","options":["$\\phi_P$","$\\nabla\\phi_P$","$\\varphi$","$\\mathbf{r}$"],"correct":[2],"feedback":"The limiter $\\varphi$ (0 ≤ $\\varphi$ ≤ 1) adjusts the gradient to preserve boundedness."},
+{"id":61,"type":"mc","prompt":"Central differencing schemes are usually avoided for convection-dominated flows because:","options":["They are too diffusive","They are unbounded and oscillatory","They cannot represent diffusion","They require high Peclet numbers"],"correct":[1],"feedback":"Central differencing lacks upwinding, making it prone to oscillations when convection dominates."},
+{"id":62,"type":"tf","prompt":"Central differencing is directionally biased and depends on the flow direction.","options":["True","False"],"correct":[1],"feedback":"It is symmetric and does not depend on flow direction."},
+{"id":63,"type":"mc","prompt":"What is the typical accuracy of the central differencing scheme?","options":["First-order","Second-order","Third-order","Zeroth-order"],"correct":[1],"feedback":"It is formally second-order accurate and symmetric between adjacent cells."},
+{"id":64,"type":"numeric","prompt":"For a Peclet number $Pe=3$, is the central differencing scheme stable? Answer 1 for stable, 0 for unstable.","numeric":{"answer":0,"tol":0},"feedback":"Central differencing becomes unstable for $Pe > 2$ because convection dominates diffusion."},
+{"id":65,"type":"mc","prompt":"Which scheme uses an exponential approximation to account for both diffusion and convection?","options":["Central differencing","QUICK","Power-law","Second-order upwind"],"correct":[2],"feedback":"The power-law scheme approximates the exponential profile, reducing to first-order upwind for large $Pe$."},
+{"id":66,"type":"tf","prompt":"For $Pe>10$, the power-law scheme reduces effectively to first-order upwind.","options":["True","False"],"correct":[0],"feedback":"At high $Pe$, diffusion is negligible and the scheme simplifies to first-order upwind."},
+{"id":67,"type":"mc","prompt":"The QUICK scheme fits a quadratic profile through which nodes?","options":["Two downstream nodes and one upstream","Two upstream and one downstream","Three upstream","Two central and one boundary"],"correct":[1],"feedback":"QUICK (Quadratic Upwind Interpolation for Convective Kinetics) uses two upstream and one downstream nodes."},
+{"id":68,"type":"tf","prompt":"QUICK is a third-order accurate scheme.","options":["True","False"],"correct":[0],"feedback":"QUICK achieves third-order accuracy for uniform grids by fitting a quadratic polynomial."},
+{"id":69,"type":"mc","prompt":"Which disadvantage is commonly associated with QUICK?","options":["Excessive numerical diffusion","Unbounded oscillations in steep gradients","Low accuracy","Instability in laminar regions"],"correct":[1],"feedback":"QUICK may produce oscillations near sharp discontinuities due to its unbounded nature."},
+{"id":70,"type":"mc","prompt":"Blended schemes combine advantages of which methods?","options":["Only first-order upwind and QUICK","First-order upwind and central differencing","Central differencing and power-law","Power-law and QUICK"],"correct":[1],"feedback":"Blended schemes mix the stability of first-order upwind with the accuracy of central differencing."},
+{"id":71,"type":"tf","prompt":"The blending function $\\chi$ in blended methods remains constant across the mesh.","options":["True","False"],"correct":[1],"feedback":"$\\chi$ can vary locally to stabilise the solution and control oscillations."},
+{"id":72,"type":"mc","prompt":"Which of the following is an example of a blended or flux-limiting approach?","options":["TVD","MUSCL","Gamma differencing","All of the above"],"correct":[3],"feedback":"TVD, TVB, Gamma differencing, and MUSCL are examples of bounded blended schemes."},
+{"id":73,"type":"tf","prompt":"Higher-order schemes are always preferable to lower-order schemes.","options":["True","False"],"correct":[1],"feedback":"Higher-order schemes improve accuracy but can reduce stability and increase computational cost."},
+{"id":74,"type":"mc","prompt":"Which scheme includes up to the second derivative term in its Taylor series expansion?","options":["First-order upwind","Second-order upwind","Central differencing","QUICK"],"correct":[3],"feedback":"QUICK includes up to the second derivative, providing third-order spatial accuracy."},
+{"id":75,"type":"tf","prompt":"False diffusion refers to physical diffusion caused by turbulence.","options":["True","False"],"correct":[1],"feedback":"False diffusion is a numerical artifact introduced by grid misalignment and low-order schemes."},
+{"id":76,"type":"mc","prompt":"False diffusion can be reduced by:","options":["Using coarser grids","Employing higher-order schemes","Increasing time step size","Decreasing density"],"correct":[1],"feedback":"Grid refinement and higher-order interpolation help mitigate false diffusion."},
+{"id":77,"type":"mc","prompt":"Which properties are desirable in discretisation schemes?","options":["Conservation","Boundedness","Stability","All of the above"],"correct":[3],"feedback":"An ideal scheme is conservative, bounded, stable, accurate, consistent, and convergent."},
+{"id":78,"type":"tf","prompt":"Boundedness ensures that computed scalar values remain within physical limits.","options":["True","False"],"correct":[0],"feedback":"Boundedness prevents unphysical negative densities or values exceeding expected ranges."},
+{"id":79,"type":"mc","prompt":"Consistency in a numerical scheme implies that:","options":["Truncation error vanishes as grid spacing tends to zero","Solution oscillations are avoided","Residuals are constant","Mesh independence is lost"],"correct":[0],"feedback":"Consistency means the discrete equations converge to the exact differential form as grid spacing decreases."},
+{"id":80,"type":"mc","prompt":"Which property ensures that numerical errors do not amplify during computation?","options":["Accuracy","Boundedness","Stability","Convergence"],"correct":[2],"feedback":"Stability ensures that errors remain controlled and solutions do not diverge."},
+{"id":81,"type":"tf","prompt":"In a stable iterative method, errors are magnified over successive iterations.","options":["True","False"],"correct":[1],"feedback":"A stable scheme attenuates or maintains error magnitudes rather than amplifying them."},
+{"id":82,"type":"mc","prompt":"Which statement about convergence is correct?","options":["It ensures zero residuals","It implies that the discrete solution approaches the exact one as grid size decreases","It guarantees physical realism","It eliminates truncation error"],"correct":[1],"feedback":"Convergence ensures that as the mesh is refined, the numerical solution tends toward the exact solution."},
+{"id":83,"type":"tf","prompt":"All finite volume schemes automatically satisfy conservation locally and globally.","options":["True","False"],"correct":[0],"feedback":"FVM integrates conservation laws over each control volume, ensuring flux balance globally and locally."},
+{"id":84,"type":"mc","prompt":"In the Green–Gauss cell-based gradient scheme, variable values at faces are computed using:","options":["Node averaging","Linear interpolation between cell centroids","Extrapolation from boundaries","Weighted least squares"],"correct":[1],"feedback":"The cell-based method linearly interpolates between owner and neighbour cell centroids."},
+{"id":85,"type":"tf","prompt":"The Green–Gauss node-based scheme introduces skewness error for non-orthogonal grids.","options":["True","False"],"correct":[1],"feedback":"The node-based method eliminates skewness error by averaging nodal values around the face."},
+{"id":86,"type":"mc","prompt":"Which gradient computation method is the most computationally expensive but also most accurate for complex meshes?","options":["Green–Gauss cell-based","Green–Gauss node-based","Least Squares cell-based","Power-law scheme"],"correct":[2],"feedback":"The least squares cell-based method minimises gradient errors across irregular meshes."},
+{"id":87,"type":"tf","prompt":"The least squares method does not use the divergence theorem.","options":["True","False"],"correct":[0],"feedback":"It forms an overdetermined linear system based on neighbour-centre differences instead of using Gauss’s theorem."},
+{"id":88,"type":"mc","prompt":"In the least squares method, the matrix equation $A\\mathbf{x}=\\mathbf{B}$ is:","options":["Square and exact","Overdetermined and solved approximately","Underdetermined","Ill-conditioned"],"correct":[1],"feedback":"The number of equations exceeds unknowns, requiring a least squares minimisation for an approximate solution."},
+{"id":89,"type":"tf","prompt":"For large aspect ratio cells, weighting functions are applied in the least squares gradient method to reduce the influence of distant neighbours.","options":["True","False"],"correct":[0],"feedback":"A weight $w_i=1/d_i$ decreases the contribution of distant neighbours, improving accuracy in stretched grids."},
+{"id":90,"type":"mc","prompt":"In stationary meshes, the least squares gradient matrices can be:","options":["Recomputed at each iteration","Precomputed once and reused","Varied randomly","Updated at every timestep"],"correct":[1],"feedback":"For fixed meshes, distance matrices remain constant and can be precomputed for efficiency."},
+{"id":91,"type":"tf","prompt":"Green–Gauss and least squares gradient methods are equivalent for perfectly orthogonal structured meshes.","options":["True","False"],"correct":[0],"feedback":"On orthogonal structured grids, both methods yield identical gradient results."},
+{"id":92,"type":"mc","prompt":"The Green–Gauss theorem converts which type of integral?","options":["Surface to volume","Volume to surface","Time to frequency","Momentum to energy"],"correct":[1],"feedback":"It converts volume integrals of divergences into surface flux integrals across control faces."},
+{"id":93,"type":"tf","prompt":"Green–Gauss methods can only be applied to scalar fields such as temperature.","options":["True","False"],"correct":[1],"feedback":"They apply equally to vector fields such as velocity, since the theorem is general to any field."},
+{"id":94,"type":"mc","prompt":"In gradient computation, the vector between the cell centroid and face centre is represented by:","options":["$\\mathbf{n}$","$\\mathbf{r}$","$\\mathbf{A}$","$\\mathbf{x}$"],"correct":[1],"feedback":"$\\mathbf{r}$ represents the vector displacement from the centroid to the face centre."},
+{"id":95,"type":"tf","prompt":"The Green–Gauss method assumes that the variation of a variable across each cell face is linear.","options":["True","False"],"correct":[0],"feedback":"Linear variation allows substitution of face-centre values for face integrals in second-order FVM."},
+{"id":96,"type":"mc","prompt":"Which quantity is summed over all cell faces in the Green–Gauss gradient expression?","options":["$T_f A_f$","$\\nabla T_f$","$V_P$","$r_f$"],"correct":[0],"feedback":"The sum of $T_f\\mathbf{n}_fA_f$ over all faces gives the cell-centre gradient."},
+{"id":97,"type":"tf","prompt":"Node-based Green–Gauss gradients require nodal values which are obtained by averaging surrounding cell-centre values.","options":["True","False"],"correct":[0],"feedback":"The nodal approach averages nearby cell values to compute more accurate face gradients."},
+{"id":98,"type":"mc","prompt":"Which statement about skewness error is true?","options":["It occurs when centroid-to-centroid lines do not pass through face centres","It affects only structured meshes","It is absent in high aspect ratio grids","It improves solution stability"],"correct":[0],"feedback":"Skewness arises from geometric misalignment between cell centroids and face centres."},
+{"id":99,"type":"mc","prompt":"The least squares gradient method expresses neighbour relationships as:","options":["$T_i - T_P = \\mathbf{d}_{P-i}\\cdot\\nabla T_P$","$T_i - T_P = \\nabla T_P/\\mathbf{d}_{P-i}$","$T_i - T_P = 0$","$\\nabla T_P = T_i + T_P$"],"correct":[0],"feedback":"Neighbour value differences are proportional to the dot product of distance vectors with the unknown gradient."},
+{"id":100,"type":"mc","prompt":"Which statement best summarises the role of interpolation and gradient schemes in FVM?","options":["They define boundary conditions only","They approximate face and gradient values to close discretised conservation equations","They are used only for post-processing","They determine time-step stability"],"correct":[1],"feedback":"Interpolation and gradient schemes provide accurate face and gradient estimates required for flux evaluation and equation closure."},
+{"id":101,"type":"tf","prompt":"In incompressible flow, the continuity equation can be directly used to calculate pressure.","options":["True","False"],"correct":[1],"feedback":"For incompressible flows, density is constant and not linked to pressure, so the continuity equation cannot directly yield pressure."},
+{"id":102,"type":"mc","prompt":"Which of the following statements best describes the role of pressure–velocity coupling in incompressible flows?","options":["It links pressure and density through the ideal gas law","It ensures that velocity and pressure fields satisfy the continuity and momentum equations simultaneously","It corrects turbulence quantities","It provides boundary conditions for energy transport"],"correct":[1],"feedback":"Pressure–velocity coupling enforces mass conservation while satisfying the momentum equations in incompressible flow."},
+{"id":103,"type":"tf","prompt":"In the finite volume discretisation of incompressible Navier–Stokes equations, pressure appears explicitly as a source term in the momentum equation.","options":["True","False"],"correct":[0],"feedback":"The pressure gradient is treated as a known source term when solving the discretised momentum equation."},
+{"id":104,"type":"mc","prompt":"Which matrix arises from discretising the momentum equations in finite volume form?","options":["K matrix","M matrix","P matrix","C matrix"],"correct":[1],"feedback":"The coefficient matrix M contains contributions from convective, diffusive, and temporal terms of the momentum equation."},
+{"id":105,"type":"mc","prompt":"The matrix M can be decomposed into which two parts to facilitate solution of pressure–velocity coupling?","options":["Upper and lower diagonal","Diagonal (A) and off-diagonal (H)","Convective and diffusive","Temporal and spatial"],"correct":[1],"feedback":"Splitting M into A and H separates invertible diagonal components from the residual terms for use in pressure correction."},
+{"id":106,"type":"tf","prompt":"The diagonal matrix A in the decomposition of M is non-invertible.","options":["True","False"],"correct":[1],"feedback":"A is diagonal and easily invertible, which simplifies the formation of the pressure correction equation."},
+{"id":107,"type":"mc","prompt":"After decomposing the momentum equation, substituting into the continuity equation yields what form?","options":["A Poisson equation for pressure","A Laplace equation for velocity","A Helmholtz equation for temperature","A Fourier equation for energy"],"correct":[0],"feedback":"Substitution results in a Poisson equation that links pressure to mass flux corrections."},
+{"id":108,"type":"tf","prompt":"The SIMPLE algorithm stands for Semi-Implicit Method for Pressure-Linked Equations.","options":["True","False"],"correct":[0],"feedback":"SIMPLE is a semi-implicit pressure–velocity coupling algorithm widely used in steady-state CFD."},
+{"id":109,"type":"mc","prompt":"Which is the correct order of operations in the SIMPLE algorithm?","options":["Solve pressure → correct velocity → solve momentum","Solve momentum → solve pressure correction → correct velocity","Solve energy → correct pressure → solve momentum","Predict turbulence → correct pressure → solve continuity"],"correct":[1],"feedback":"The momentum equations are solved first, followed by pressure correction and velocity adjustment to enforce continuity."},
+{"id":110,"type":"tf","prompt":"The predicted velocity field from the momentum equation automatically satisfies continuity.","options":["True","False"],"correct":[1],"feedback":"Initially, the predicted velocity field does not satisfy continuity and requires correction through pressure adjustment."},
+{"id":111,"type":"mc","prompt":"Which of the following best describes the purpose of the pressure correction equation in SIMPLE?","options":["To update density distribution","To enforce the momentum equation","To correct velocity fields to satisfy continuity","To accelerate convergence"],"correct":[2],"feedback":"The pressure correction equation modifies pressure and velocity to maintain mass conservation."},
+{"id":112,"type":"mc","prompt":"Which equation is used to update velocity after solving for pressure correction?","options":["$\\mathbf{v} = \\mathbf{A}^{-1}\\mathbf{H} - \\mathbf{A}^{-1}\\nabla p'$","$\\nabla \\cdot \\mathbf{v} = 0$","$\\mathbf{v} = \\mathbf{H}\\nabla p'$","$M\\mathbf{v} = -\\nabla p$"],"correct":[0],"feedback":"Velocity correction uses both the known H term and the new pressure gradient to update velocity."},
+{"id":113,"type":"tf","prompt":"The SIMPLE algorithm requires multiple outer iterations because each updated velocity field reintroduces a continuity imbalance.","options":["True","False"],"correct":[0],"feedback":"Each update slightly disturbs the coupled balance, requiring iterative correction until residuals converge."},
+{"id":114,"type":"mc","prompt":"In the PISO algorithm, which aspect distinguishes it from SIMPLE?","options":["Multiple inner pressure corrections per momentum solve","Explicit pressure correction","Iterative over-relaxation of H","Omission of momentum predictor"],"correct":[0],"feedback":"PISO employs multiple inner corrections without re-solving the momentum equations each time."},
+{"id":115,"type":"tf","prompt":"The PISO algorithm requires solving the momentum predictor only once per time step.","options":["True","False"],"correct":[0],"feedback":"PISO uses a single momentum predictor followed by multiple pressure corrections for transient stability."},
+{"id":116,"type":"mc","prompt":"SIMPLE is most appropriate for which type of flow problem?","options":["Transient incompressible","Steady incompressible","Compressible inviscid","Multiphase turbulent"],"correct":[1],"feedback":"SIMPLE was originally developed for steady-state incompressible simulations where under-relaxation ensures stability."},
+{"id":117,"type":"mc","prompt":"PISO is preferred for which conditions?","options":["Steady-state flows","Explicitly steady compressible flows","Unsteady incompressible flows with small time steps","Purely diffusive heat conduction"],"correct":[2],"feedback":"PISO is suited for transient problems where time derivative terms dominate and small time steps ensure stability."},
+{"id":118,"type":"tf","prompt":"In PISO, pressure corrections are performed after each re-solve of the momentum equation.","options":["True","False"],"correct":[1],"feedback":"PISO performs several pressure corrections without re-solving the momentum predictor, saving computational cost."},
+{"id":119,"type":"mc","prompt":"Which of the following algorithms combines features of SIMPLE and PISO for improved efficiency?","options":["PIMPLE","SIMPLEC","SIMPLER","SIP"],"correct":[0],"feedback":"PIMPLE, used in OpenFOAM, blends SIMPLE’s robustness with PISO’s inner corrections for better convergence control."},
+{"id":120,"type":"tf","prompt":"All pressure–velocity coupling schemes ultimately converge to the same physical solution given identical conditions.","options":["True","False"],"correct":[0],"feedback":"Each algorithm converges to the same final solution; the difference lies in speed and numerical stability."},
+{"id":121,"type":"mc","prompt":"In the matrix decomposition $M = A + H$, what does H represent physically?","options":["The residual or non-diagonal influence of neighbouring cells","Pressure field correction","Time derivative","Viscous stress"],"correct":[0],"feedback":"H captures the off-diagonal influence from neighbour cells, essential for constructing the pressure correction equation."},
+{"id":122,"type":"tf","prompt":"Under-relaxation artificially increases diagonal dominance of the coefficient matrix in SIMPLE.","options":["True","False"],"correct":[0],"feedback":"Reducing relaxation factors enhances diagonal dominance, improving numerical stability in steady-state solvers."},
+{"id":123,"type":"mc","prompt":"Which version of SIMPLE is designed for faster convergence with consistent velocity-pressure coupling?","options":["SIMPLEC","SIMPLER","PISO","PIMPLE"],"correct":[0],"feedback":"SIMPLEC (SIMPLE Consistent) modifies the pressure correction formulation for more consistent coupling and faster convergence."},
+{"id":124,"type":"tf","prompt":"SIMPLER (SIMPLE Revised) improves stability by solving the pressure equation in an intermediate step.","options":["True","False"],"correct":[0],"feedback":"SIMPLER solves a revised pressure equation to enhance coupling and reduce oscillations between iterations."},
+{"id":125,"type":"mc","prompt":"The Courant number (Co) expresses the ratio between:","options":["Convective and diffusive fluxes","Temporal and spatial discretisation scales","Time step and number of grid cells","Density and viscosity"],"correct":[1],"feedback":"The Courant number is the ratio of fluid displacement per time step to the cell width, measuring time-step adequacy."},
+{"id":126,"type":"tf","prompt":"The Courant number originates from a stability condition for explicit numerical schemes.","options":["True","False"],"correct":[0],"feedback":"The Courant–Friedrichs–Lewy condition establishes stability requirements for explicit time integration of PDEs."},
+{"id":127,"type":"mc","prompt":"In one dimension, the Courant number is expressed as:","options":["$Co = v/\\Delta t$","$Co = \\Delta x / (v\\Delta t)$","$Co = v\\Delta t / \\Delta x$","$Co = \\rho v \\Delta t$"],"correct":[2],"feedback":"The Courant number equals the ratio of the distance travelled by the fluid during a time step to the cell size."},
+{"id":128,"type":"numeric","prompt":"A velocity of 2 m/s, cell size 0.01 m, and time step 0.002 s yield a Courant number of ______ (±0.05).","numeric":{"answer":0.4,"tol":0.05},"feedback":"$Co = v \\Delta t / \\Delta x = (2)(0.002)/0.01 = 0.4$."},
+{"id":129,"type":"tf","prompt":"A Courant number greater than 1 in explicit time-marching schemes can cause instability.","options":["True","False"],"correct":[0],"feedback":"When Co > 1, information moves through more than one control volume per step, violating stability criteria."},
+{"id":130,"type":"mc","prompt":"For a stable explicit time integration, which of the following must be true?","options":["$Co < 1$","$Co > 10$","$Co = 0$","$Co = 2$"],"correct":[0],"feedback":"Most explicit schemes require $Co < 1$ to maintain numerical stability."},
+{"id":131,"type":"tf","prompt":"The Courant number depends on mesh size, time step, and flow velocity.","options":["True","False"],"correct":[0],"feedback":"Smaller cells, shorter time steps, or lower velocities reduce the Courant number and increase stability."},
+{"id":132,"type":"mc","prompt":"In OpenFOAM, the cell-based definition of Courant number uses which quantities?","options":["Cell volume and total cell area","Velocity magnitude only","Viscous stress","Density gradient"],"correct":[0],"feedback":"OpenFOAM defines cell distance as $\\Delta x = V_p/A$ using cell volume and total surface area."},
+{"id":133,"type":"tf","prompt":"The Courant number field is uniform across a mesh for a steady flow simulation.","options":["True","False"],"correct":[1],"feedback":"Co varies spatially depending on local velocity and mesh size; it is not constant even in steady flows."},
+{"id":134,"type":"mc","prompt":"For general 3-D cells, the local Courant number is computed using which face quantities?","options":["$v_f \\cdot n_f$ and $A_f$","Face pressure and temperature","Face density and enthalpy","Turbulent kinetic energy and viscosity"],"correct":[0],"feedback":"The Courant number involves the velocity normal to each face and the corresponding face area."},
+{"id":135,"type":"tf","prompt":"The total flux through all cell faces must equal zero according to mass conservation.","options":["True","False"],"correct":[0],"feedback":"Conservation of mass requires that net flux across all faces of a control volume be zero."},
+{"id":136,"type":"mc","prompt":"Why is a factor of ½ included in the practical definition of Co for CFD codes?","options":["To average positive and negative fluxes","To correct for doubled flux when taking absolute values","To stabilise diffusion terms","To adjust for compressibility"],"correct":[1],"feedback":"Since flux magnitudes are treated as positive, total flux doubles; multiplying by ½ restores the correct scale."},
+{"id":137,"type":"tf","prompt":"The Courant number can be visualised as a field variable in CFD post-processing.","options":["True","False"],"correct":[0],"feedback":"It is often plotted to identify regions where the time-step condition is violated."},
+{"id":138,"type":"mc","prompt":"What effect does a high Courant number have on transient simulation results?","options":["Improves accuracy","Reduces computational effort","Causes numerical instability or divergence","Enhances turbulence modelling"],"correct":[2],"feedback":"Exceeding the stability limit (Co > 1) can lead to oscillations or divergence in explicit solvers."},
+{"id":139,"type":"tf","prompt":"Adaptive time stepping maintains a constant Courant number by adjusting the time step during simulation.","options":["True","False"],"correct":[0],"feedback":"Adaptive schemes dynamically adjust ∆t to keep Co below a specified maximum value for stability."},
+{"id":140,"type":"mc","prompt":"In adaptive time stepping, if the computed Courant number exceeds the specified maximum, the solver should:","options":["Increase ∆t","Reduce ∆t","Increase velocity","Refine the mesh"],"correct":[1],"feedback":"When Co exceeds the limit, the next time step is shortened to restore stability."},
+{"id":141,"type":"tf","prompt":"The Courant–Friedrichs–Lewy (CFL) condition applies primarily to implicit time-stepping schemes.","options":["True","False"],"correct":[1],"feedback":"The CFL condition primarily constrains explicit time-stepping methods, though it can influence implicit solver accuracy."},
+{"id":142,"type":"mc","prompt":"Which property of the numerical matrix improves as Co decreases?","options":["Diagonal dominance","Condition number","Sparsity","Orthogonality"],"correct":[0],"feedback":"Lower Co increases the relative weight of diagonal terms, improving numerical stability."},
+{"id":143,"type":"tf","prompt":"The maximum Courant number is commonly reported by CFD solvers to assess time-step adequacy.","options":["True","False"],"correct":[0],"feedback":"Solvers like Fluent and OpenFOAM compute and display the maximum Co at each time step to monitor stability."},
+{"id":144,"type":"mc","prompt":"Which variables influence the Courant number most directly?","options":["Velocity magnitude, time step, and cell size","Viscosity and turbulence intensity","Pressure gradient and density","Boundary temperature and Reynolds number"],"correct":[0],"feedback":"The Courant number depends on velocity, time-step size, and local mesh spacing."},
+{"id":145,"type":"tf","prompt":"If the maximum Courant number in a simulation is less than one, the time integration is stable for explicit schemes.","options":["True","False"],"correct":[0],"feedback":"When Co < 1, the fluid particle does not traverse more than one cell per step, ensuring stable integration."},
+{"id":146,"type":"mc","prompt":"What does the Courant number physically represent?","options":["Ratio of numerical diffusion to viscosity","Fraction of a cell traversed by fluid in one time step","Difference between inlet and outlet fluxes","Mass conservation error"],"correct":[1],"feedback":"It indicates how far information travels relative to cell size during each time step."},
+{"id":147,"type":"tf","prompt":"In practice, modern CFD codes allow Co > 1 when implicit solvers are used.","options":["True","False"],"correct":[0],"feedback":"Implicit solvers can tolerate larger time steps because they are unconditionally stable with respect to Co."},
+{"id":148,"type":"mc","prompt":"For a simulation with velocity 5 m/s and cell size 0.005 m, what is the maximum stable time step for Co = 1?","options":["0.001 s","0.0005 s","0.002 s","0.0001 s"],"correct":[1],"feedback":"From $Co = v\\Delta t / \\Delta x$, the maximum ∆t = Co×∆x/v = (1×0.005)/5 = 0.001 s."},
+{"id":149,"type":"tf","prompt":"Sudden large changes in time step can cause solution divergence even if Co < 1.","options":["True","False"],"correct":[0],"feedback":"Abrupt time-step variation can disrupt numerical stability, so relaxation is applied to control ∆t changes."},
+{"id":150,"type":"mc","prompt":"Which best summarises the relationship between p–v coupling and the Courant number in FVM?","options":["Both control numerical diffusion only","p–v coupling ensures pressure–velocity consistency, while the Courant number governs time-step stability","The Courant number defines under-relaxation","They are independent and unrelated"],"correct":[1],"feedback":"Pressure–velocity coupling maintains mass conservation, whereas the Courant number restricts time-step size for stable transient simulation."}
+
+];
+
+/* ===========================
+   STATE & SETTINGS
+   =========================== */
+const els = {
+  main: document.getElementById('main'),
+  meta: document.getElementById('metaInfo'),
+  chkShuffle: document.getElementById('chkShuffle'),
+  chkInstant: document.getElementById('chkInstant'),
+  chkShowCorrect: document.getElementById('chkShowCorrect'),
+  chkAutosave: document.getElementById('chkAutosave'),
+  btnStart: document.getElementById('btnStart'),
+  btnSubmit: document.getElementById('btnSubmit'),
+  btnSave: document.getElementById('btnSave'),
+  btnLoad: document.getElementById('btnLoad'),
+  btnExport: document.getElementById('btnExport'),
+  fileImport: document.getElementById('fileImport'),
+  btnPaste: document.getElementById('btnPaste'),
+  jumpGrid: document.getElementById('jumpGrid'),
+  scoreRaw: document.getElementById('scoreRaw'),
+  scorePct: document.getElementById('scorePct'),
+  pillPF: document.getElementById('pillPF'),
+};
+
+const LS_KEY = 'cfm_mcq_state_v1';          // persistent (user opt-in via checkbox)
+const SS_KEY = 'cfm_mcq_session_v1';        // per-tab/session (always used)
+
+/* Core application state */
+let state = {
+  bank: structuredClone(QUESTION_BANK),
+  order: [],                  // array of indices into bank
+  answers: {},                // id -> answer shape by type
+  graded: false,
+  perQuestionCorrect: {},     // id -> boolean
+  settings: {
+    shuffle: false,
+    instant: false,
+    showCorrectAfterSubmit: false,
+    autosave: true
+  }
+};
+
+function setMeta(msg){ els.meta.textContent = msg; }
+
+function saveIfEnabled(){
+  // Always save session so the user’s session is preserved in this tab only.
+  saveSession();
+  // Optionally mirror to localStorage if the user wants persistence across visits.
+  if (state.settings.autosave) saveState();
+}
+
+/* ===========================
+   UTILITIES
+   =========================== */
+function uid(prefix='id'){ return prefix + Math.random().toString(36).slice(2,9); }
+
+function deepEqualSet(a, b){
+  if (!Array.isArray(a) || !Array.isArray(b)) return false;
+  if (a.length !== b.length) return false;
+  const sa = new Set(a), sb = new Set(b);
+  if (sa.size !== sb.size) return false;
+  for (const v of sa){ if (!sb.has(v)) return false; }
+  return true;
+}
+function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+function normalizeNumberInput(s){
+  if (typeof s !== 'string') return s;
+  return s.replace(/\u2212/g, '-').trim();
+}
+function toFixedSmart(n, digits=2){
+  if (!isFinite(n)) return String(n);
+  if (Math.abs(n) >= 1000) return n.toFixed(0);
+  if (Math.abs(n) >= 10) return n.toFixed(2);
+  return n.toFixed(digits);
+}
+function shuffleInPlace(arr){
+  for (let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function safeSpan(text){
+  const span = document.createElement('span');
+  span.textContent = text ?? '';
+  return span;
+}
+async function typeset(targets){
+  try{
+    if (window.MathJax && MathJax.typesetPromise){
+      await MathJax.typesetPromise(targets ? (Array.isArray(targets)?targets:[targets]) : undefined);
+    }
+  }catch(e){
+    console.error('MathJax typeset error:', e);
+  }
+}
+
+/* ===========================
+   RENDERING
+   =========================== */
+function buildOrder(){
+  const idxs = state.bank.map((_,i)=>i);
+  if (state.settings.shuffle) return shuffleInPlace(idxs);
+  return idxs;
+}
+
+function answeredStatusFor(q){
+  const ans = state.answers[q.id];
+  switch(q.type){
+    case 'tf':
+    case 'mc':
+      return typeof ans === 'number';
+    case 'multi':
+      return Array.isArray(ans) && ans.length>0;
+    case 'numeric':
+      return typeof ans === 'number' && !Number.isNaN(ans);
+    case 'matching':
+      return Array.isArray(ans) && ans.every(v => typeof v === 'number');
+    default:
+      return false;
+  }
+}
+
+function render(){
+  els.main.innerHTML = '';
+  els.jumpGrid.innerHTML = '';
+  state.order = state.order && state.order.length ? state.order : buildOrder();
+
+  // Jump Grid
+  state.order.forEach((bi, idx)=>{
+    const q = state.bank[bi];
+    const btn = document.createElement('button');
+    btn.type='button';
+    btn.textContent = String(idx+1);
+    btn.classList.add('unanswered');
+    btn.addEventListener('click', ()=>{
+      const card = document.getElementById('q_'+q.id);
+      if (card){ card.scrollIntoView({behavior:'smooth', block:'start'}); card.focus({preventScroll:true}); }
+    });
+    els.jumpGrid.appendChild(btn);
+  });
+
+  // Cards
+  state.order.forEach((bi, idx)=>{
+    const q = state.bank[bi];
+    const card = document.createElement('article');
+    card.className = 'q-card';
+    card.id = 'q_'+q.id;
+    card.tabIndex = -1;
+
+    const head = document.createElement('div');
+    head.className = 'q-head';
+
+    const title = document.createElement('div');
+    title.className='q-title';
+    title.append(safeSpan('Q'+(idx+1)+': '), safeSpan(q.prompt||'(missing prompt)'));
+
+    const tags = document.createElement('div'); tags.className='tags';
+    if (q.tags && Array.isArray(q.tags)){ q.tags.forEach(t=>{ const tg=document.createElement('span'); tg.className='tag'; tg.textContent=t; tags.appendChild(tg); }); }
+
+    head.append(title, tags);
+    card.appendChild(head);
+
+    const body = document.createElement('div');
+    const fs = document.createElement('fieldset');
+    const legend = document.createElement('legend'); legend.className='sr-only'; legend.textContent='Question '+(idx+1);
+    fs.appendChild(legend);
+
+    const choices = document.createElement('div');
+    choices.className='choices';
+
+    if (q.type==='tf' || q.type==='mc'){
+      const name = uid('rg');
+      (q.options||[]).forEach((opt, oi)=>{
+        const wrap = document.createElement('div'); wrap.className='choice';
+        const input = document.createElement('input');
+        input.type='radio'; input.name=name; input.id = uid('opt'); input.value=String(oi);
+        input.setAttribute('aria-describedby', 'q_'+q.id);
+        const lab = document.createElement('label'); lab.setAttribute('for', input.id);
+        lab.appendChild(safeSpan(opt));
+        if (typeof state.answers[q.id]==='number' && state.answers[q.id]===oi){ input.checked=true; wrap.classList.add('selected'); }
+        input.addEventListener('change', ()=>{
+          state.answers[q.id]=oi;
+          if (state.settings.instant) showImmediateFeedback(q, choices);
+          updateJumpStatuses();
+          saveIfEnabled();
+        });
+        wrap.append(input, lab); choices.appendChild(wrap);
+      });
+    } else if (q.type==='multi'){
+      const name = uid('cg');
+      (q.options||[]).forEach((opt, oi)=>{
+        const wrap = document.createElement('div'); wrap.className='choice';
+        const input = document.createElement('input');
+        input.type='checkbox'; input.name=name; input.id = uid('opt'); input.value=String(oi);
+        const lab = document.createElement('label'); lab.setAttribute('for', input.id);
+        lab.appendChild(safeSpan(opt));
+        const arr = Array.isArray(state.answers[q.id])? new Set(state.answers[q.id]) : new Set();
+        if (arr.has(oi)){ input.checked=true; wrap.classList.add('selected'); }
+        input.addEventListener('change', ()=>{
+          const cur = Array.isArray(state.answers[q.id])? new Set(state.answers[q.id]) : new Set();
+          if (input.checked) cur.add(oi); else cur.delete(oi);
+          state.answers[q.id]=Array.from(cur).sort((a,b)=>a-b);
+          if (state.settings.instant) showImmediateFeedback(q, choices);
+          updateJumpStatuses();
+          saveIfEnabled();
+        });
+        wrap.append(input, lab); choices.appendChild(wrap);
+      });
+    } else if (q.type==='numeric'){
+      const wrap = document.createElement('div'); wrap.className='row';
+      const inp = document.createElement('input');
+      inp.type='text';
+      inp.inputMode='decimal';
+      inp.placeholder='Enter a number';
+      if (typeof state.answers[q.id]==='number' && !Number.isNaN(state.answers[q.id])){
+        inp.value = String(state.answers[q.id]);
+      }
+      inp.addEventListener('input', ()=>{
+        const val = normalizeNumberInput(inp.value);
+        const num = parseFloat(val);
+        if (!Number.isNaN(num)){ state.answers[q.id]=num; }
+        else { delete state.answers[q.id]; }
+        if (state.settings.instant) showImmediateFeedback(q, choices);
+        updateJumpStatuses();
+        saveIfEnabled();
+      });
+      wrap.appendChild(inp);
+      choices.appendChild(wrap);
+    } else if (q.type==='matching'){
+      const m = q.matching;
+      if (!m || !Array.isArray(m.left) || !Array.isArray(m.right) || !Array.isArray(m.answers)){
+        const warn = document.createElement('div'); warn.className='feedback bad'; warn.textContent='Invalid matching question schema.';
+        choices.appendChild(warn);
+      }else{
+        const selVals = Array.isArray(state.answers[q.id]) ? state.answers[q.id].slice() : new Array(m.left.length).fill(undefined);
+        m.left.forEach((lv, li)=>{
+          const row = document.createElement('div'); row.className='match-row';
+          const leftSpan = safeSpan(lv);
+          const sel = document.createElement('select');
+          sel.setAttribute('aria-label','Match for "'+lv+'"');
+          const opt0 = document.createElement('option'); opt0.value=''; opt0.textContent='— Select —'; sel.appendChild(opt0);
+          m.right.forEach((rv, ri)=>{
+            const o = document.createElement('option'); o.value=String(ri); o.appendChild(safeSpan(rv));
+            sel.appendChild(o);
+          });
+          if (typeof selVals[li]==='number'){ sel.value = String(selVals[li]); }
+          sel.addEventListener('change', ()=>{
+            const v = sel.value==='' ? undefined : parseInt(sel.value,10);
+            const cur = Array.isArray(state.answers[q.id]) ? state.answers[q.id].slice() : new Array(m.left.length).fill(undefined);
+            cur[li]=v;
+            state.answers[q.id]=cur;
+            if (state.settings.instant) showImmediateFeedback(q, choices);
+            updateJumpStatuses();
+            saveIfEnabled();
+          });
+          row.append(leftSpan, sel); choices.appendChild(row);
+        });
+      }
+    } else {
+      const warn = document.createElement('div'); warn.className='feedback bad'; warn.textContent='Unknown question type "'+(q.type||'?')+'".';
+      choices.appendChild(warn);
+    }
+
+    fs.appendChild(choices);
+    body.appendChild(fs);
+    card.appendChild(safeSpan(q.prompt? '': ''));
+    card.appendChild(body);
+
+    const fb = document.createElement('div');
+    fb.className='feedback';
+    fb.style.display='none';
+    card.appendChild(fb);
+
+    els.main.appendChild(card);
+  });
+
+  updateJumpStatuses();
+  typeset([document.body]);
+  setMeta('Rendered '+state.order.length+' question(s).');
+}
+
+function updateJumpStatuses(){
+  const buttons = els.jumpGrid.querySelectorAll('button');
+  buttons.forEach((btn, idx)=>{
+    const q = state.bank[state.order[idx]];
+    btn.classList.remove('answered','unanswered','correct','wrong');
+    if (state.graded){
+      const ok = !!state.perQuestionCorrect[q.id];
+      btn.classList.add(ok?'correct':'wrong');
+    } else {
+      btn.classList.add(answeredStatusFor(q)?'answered':'unanswered');
+    }
+  });
+}
+
+/* ===========================
+   GRADING
+   =========================== */
+function gradeSingle(q){
+  let correct=false, show = {text:'', class:''}, corrInfo=null;
+
+  if (q.type==='tf' || q.type==='mc'){
+    const ans = state.answers[q.id];
+    correct = (typeof ans==='number') && Array.isArray(q.correct) && q.correct.length===1 && ans===q.correct[0];
+    corrInfo = { correctIndices: q.correct||[] };
+    show.text = correct ? 'Correct.' : 'Incorrect.';
+  } else if (q.type==='multi'){
+    const ans = Array.isArray(state.answers[q.id]) ? state.answers[q.id] : [];
+    const expected = Array.isArray(q.correct) ? q.correct.slice().sort((a,b)=>a-b) : [];
+    correct = deepEqualSet(ans, expected);
+    corrInfo = { correctIndices: expected };
+    show.text = correct ? 'Correct.' : 'Incorrect.';
+  } else if (q.type==='numeric'){
+    const user = state.answers[q.id];
+    if (q.numeric && typeof q.numeric.answer==='number' && typeof q.numeric.tol==='number'){
+      if (typeof user==='number' && !Number.isNaN(user)){
+        const diff = Math.abs(user - q.numeric.answer);
+        correct = diff <= q.numeric.tol;
+      } else { correct = false; }
+      corrInfo = { answer:q.numeric.answer, tol:q.numeric.tol, user:user };
+      show.text = correct ? 'Correct.' : 'Incorrect.';
+    } else {
+      show.text = 'Invalid numeric schema.'; correct=false;
+    }
+  } else if (q.type==='matching'){
+    const m = q.matching || {};
+    const user = Array.isArray(state.answers[q.id]) ? state.answers[q.id] : [];
+    if (Array.isArray(m.answers) && Array.isArray(m.left)){
+      correct = (user.length===m.left.length) && user.every((v,i)=> typeof v==='number' && v===m.answers[i]);
+      corrInfo = { answers: m.answers };
+      show.text = correct ? 'Correct.' : 'Incorrect.';
+    } else { correct=false; show.text='Invalid matching schema.'; }
+  }
+  show.class = correct ? 'ok' : 'bad';
+  return {correct, show, corrInfo};
+}
+
+function highlightChoices(q, container, result, revealCorrect){
+  container.querySelectorAll('.choice').forEach(ch=>{
+    ch.classList.remove('correct','wrong');
+  });
+  if (q.type==='tf' || q.type==='mc'){
+    const ans = state.answers[q.id];
+    const correctIdx = (q.correct && q.correct[0]);
+    container.querySelectorAll('input[type=radio]').forEach(inp=>{
+      const idx = parseInt(inp.value,10);
+      const wrap = inp.parentElement;
+      if (idx===ans && typeof ans==='number'){
+        wrap.classList.add(result.correct ? 'correct':'wrong');
+      }
+      if (revealCorrect && idx===correctIdx) wrap.classList.add('correct');
+      if (inp.checked) wrap.classList.add('selected'); else wrap.classList.remove('selected');
+    });
+  } else if (q.type==='multi'){
+    const ansSet = new Set(Array.isArray(state.answers[q.id])? state.answers[q.id] : []);
+    const correctSet = new Set(Array.isArray(q.correct)? q.correct : []);
+    container.querySelectorAll('input[type=checkbox]').forEach(inp=>{
+      const idx = parseInt(inp.value,10);
+      const wrap = inp.parentElement;
+      const isSelected = inp.checked;
+      if (isSelected){
+        if (result.correct) wrap.classList.add('correct');
+        else wrap.classList.add(correctSet.has(idx)?'correct':'wrong');
+      } else if (revealCorrect && correctSet.has(idx)){
+        wrap.classList.add('correct');
+      }
+      if (isSelected) wrap.classList.add('selected'); else wrap.classList.remove('selected');
+    });
+  } else if (q.type==='matching'){
+    if (revealCorrect){
+      const m = q.matching;
+      const selects = container.querySelectorAll('select');
+      selects.forEach((sel, li)=>{
+        const ok = sel.value !== '' && parseInt(sel.value,10) === m.answers[li];
+        sel.style.borderColor = ok ? 'var(--ok)' : 'var(--danger)';
+      });
+    }
+  }
+}
+
+function showImmediateFeedback(q, choicesContainer){
+  const res = gradeSingle(q);
+  const card = document.getElementById('q_'+q.id);
+  const fb = card ? card.querySelector('.feedback') : null;
+  if (!fb) return;
+  fb.style.display='block';
+  fb.classList.remove('ok','bad');
+  fb.classList.add(res.show.class);
+  fb.innerHTML='';
+  const line1 = document.createElement('div'); line1.appendChild(safeSpan(res.show.text));
+  fb.appendChild(line1);
+  if (q.feedback){
+    const line2 = document.createElement('div'); line2.appendChild(safeSpan(q.feedback)); fb.appendChild(line2);
+  }
+  const reveal = state.settings.showCorrectAfterSubmit && state.graded;
+  highlightChoices(q, choicesContainer, res, reveal);
+  typeset(fb);
+}
+
+function submitAll(){
+  let correctCount = 0;
+  state.perQuestionCorrect = {};
+  state.order.forEach(bi=>{
+    const q = state.bank[bi];
+    const res = gradeSingle(q);
+    state.perQuestionCorrect[q.id] = !!res.correct;
+    if (res.correct) correctCount++;
+    const card = document.getElementById('q_'+q.id);
+    const fb = card ? card.querySelector('.feedback') : null;
+    const choices = card ? card.querySelector('.choices') : null;
+    if (fb && choices){
+      fb.style.display='block';
+      fb.classList.remove('ok','bad');
+      fb.classList.add(res.show.class);
+      fb.innerHTML='';
+      const line1 = document.createElement('div'); line1.appendChild(safeSpan(res.show.text));
+      fb.appendChild(line1);
+      if (state.settings.showCorrectAfterSubmit){
+        if (q.type==='numeric' && res.corrInfo){
+          const msg = `Expected ≈ ${toFixedSmart(res.corrInfo.answer)} (±${toFixedSmart(res.corrInfo.tol)}).`;
+          const d = document.createElement('div'); d.appendChild(safeSpan(msg)); fb.appendChild(d);
+        } else if (q.type==='matching' && q.matching){
+          const mwrap = document.createElement('div');
+          const pairs = q.matching.left.map((lv, li)=> `${lv} ↔ ${q.matching.right[q.matching.answers[li]]}`);
+          mwrap.appendChild(safeSpan('Correct mapping: '+pairs.join(' | ')));
+          fb.appendChild(mwrap);
+        } else if ((q.type==='tf' || q.type==='mc' || q.type==='multi') && Array.isArray(q.options) && Array.isArray(q.correct)){
+          const labs = q.correct.map(ci => q.options[ci]).filter(Boolean);
+          const d = document.createElement('div'); d.appendChild(safeSpan('Correct: '+labs.join(', ')));
+          fb.appendChild(d);
+        }
+      }
+      if (q.feedback){
+        const line2 = document.createElement('div'); line2.appendChild(safeSpan(q.feedback)); fb.appendChild(line2);
+      }
+      highlightChoices(q, choices, res, state.settings.showCorrectAfterSubmit);
+      typeset(fb);
+    }
+  });
+  state.graded = true;
+  const total = state.order.length || 0;
+  const pct = total? Math.round((correctCount/total)*100) : 0;
+  els.scoreRaw.textContent = `${correctCount}/${total}`;
+  els.scorePct.textContent = `${pct}%`;
+  els.pillPF.textContent = pct>=70? 'PASS' : 'FAIL';
+  els.pillPF.className = 'pill ' + (pct>=70? 'pass':'fail');
+  updateJumpStatuses();
+  saveIfEnabled();
+  setMeta('Submitted. Score '+correctCount+'/'+total+' ('+pct+'%).');
+}
+
+/* ===========================
+   PERSISTENCE & I/O
+   =========================== */
+/* Persistent save (optional, controlled by checkbox) */
+function saveState(){
+  try{
+    const payload = {
+      bank: state.bank,
+      order: state.order,
+      answers: state.answers,
+      graded: state.graded,
+      perQuestionCorrect: state.perQuestionCorrect,
+      settings: state.settings,
+      savedAt: new Date().toISOString()
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(payload));
+    setMeta('Saved to localStorage.');
+  }catch(e){
+    alert('Save failed: '+ e.message);
+  }
+}
+
+function loadState(){
+  try{
+    const s = localStorage.getItem(LS_KEY);
+    if (!s){ alert('No saved state found.'); return; }
+    const obj = JSON.parse(s);
+    if (!Array.isArray(obj.bank)) throw new Error('Invalid bank in save.');
+    state.bank = obj.bank;
+    state.order = Array.isArray(obj.order)? obj.order : buildOrder();
+    state.answers = obj.answers || {};
+    state.graded = !!obj.graded;
+    state.perQuestionCorrect = obj.perQuestionCorrect || {};
+    state.settings = Object.assign({}, state.settings, obj.settings||{});
+    els.chkShuffle.checked = !!state.settings.shuffle;
+    els.chkInstant.checked = !!state.settings.instant;
+    els.chkShowCorrect.checked = !!state.settings.showCorrectAfterSubmit;
+    els.chkAutosave.checked = !!state.settings.autosave;
+    render();
+    if (state.graded) submitAll();
+    else { els.pillPF.textContent='—'; els.pillPF.className='pill'; els.scoreRaw.textContent='0/'+state.order.length; els.scorePct.textContent='0%'; }
+    setMeta('Loaded saved state.');
+    saveSession(); // mirror into session for this tab
+  }catch(e){
+    alert('Load failed: '+ e.message);
+  }
+}
+
+/* Session save (always on, tab-scoped) */
+function saveSession(){
+  try{
+    const payload = {
+      bank: state.bank,
+      order: state.order,
+      answers: state.answers,
+      graded: state.graded,
+      perQuestionCorrect: state.perQuestionCorrect,
+      settings: state.settings,
+      savedAt: new Date().toISOString()
+    };
+    sessionStorage.setItem(SS_KEY, JSON.stringify(payload));
+  }catch(e){
+    console.warn('Session save failed:', e.message);
+  }
+}
+
+function loadSessionIfAny(){
+  try{
+    const s = sessionStorage.getItem(SS_KEY);
+    if (!s) return false;
+    const obj = JSON.parse(s);
+    if (!Array.isArray(obj.bank)) return false;
+    state.bank = obj.bank;
+    state.order = Array.isArray(obj.order)? obj.order : buildOrder();
+    state.answers = obj.answers || {};
+    state.graded = !!obj.graded;
+    state.perQuestionCorrect = obj.perQuestionCorrect || {};
+    state.settings = Object.assign({}, state.settings, obj.settings||{});
+    els.chkShuffle.checked = !!state.settings.shuffle;
+    els.chkInstant.checked = !!state.settings.instant;
+    els.chkShowCorrect.checked = !!state.settings.showCorrectAfterSubmit;
+    els.chkAutosave.checked = !!state.settings.autosave;
+    render();
+    if (state.graded) submitAll();
+    else { els.pillPF.textContent='—'; els.pillPF.className='pill'; els.scoreRaw.textContent='0/'+state.order.length; els.scorePct.textContent='0%'; }
+    setMeta('Restored session.');
+    return true;
+  }catch(e){
+    console.warn('Session load failed:', e.message);
+    return false;
+  }
+}
+
+function exportAttempt(){
+  try{
+    const total = state.order.length;
+    const correctN = Object.values(state.perQuestionCorrect||{}).filter(Boolean).length;
+    const exportObj = {
+      exportedAt: new Date().toISOString(),
+      totalQuestions: total,
+      correct: correctN,
+      percent: total? Math.round(correctN/total*100) : 0,
+      graded: !!state.graded,
+      order: state.order,
+      answers: state.answers,
+      questionIds: state.order.map(i=> state.bank[i]?.id)
+    };
+    const blob = new Blob([JSON.stringify(exportObj,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cfm_attempt.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
+  }catch(e){
+    alert('Export failed: '+ e.message);
+  }
+}
+
+function validateBank(arr){
+  if (!Array.isArray(arr)) throw new Error('Root is not an array.');
+  for (const q of arr){
+    if (typeof q.id!=='number') throw new Error('Question missing numeric id.');
+    if (typeof q.type!=='string') throw new Error('Question '+q.id+' missing type.');
+    const t = q.type;
+    if (t==='tf' || t==='mc' || t==='multi'){
+      if (!Array.isArray(q.options) || q.options.length===0) throw new Error('Question '+q.id+' missing options.');
+      if (!Array.isArray(q.correct)) throw new Error('Question '+q.id+' missing correct indices.');
+    } else if (t==='numeric'){
+      if (!q.numeric || typeof q.numeric.answer!=='number' || typeof q.numeric.tol!=='number')
+        throw new Error('Question '+q.id+' numeric requires answer & tol.');
+    } else if (t==='matching'){
+      if (!q.matching || !Array.isArray(q.matching.left) || !Array.isArray(q.matching.right) || !Array.isArray(q.matching.answers))
+        throw new Error('Question '+q.id+' matching requires left/right/answers.');
+    } else {
+      throw new Error('Question '+q.id+' has unknown type "'+t+'".');
+    }
+  }
+  return true;
+}
+
+function importFromJSONText(text){
+  try{
+    const arr = JSON.parse(text);
+    validateBank(arr);
+    state.bank = arr;
+    state.order = buildOrder();
+    state.answers = {};
+    state.graded = false;
+    state.perQuestionCorrect = {};
+    render();
+    els.pillPF.textContent='—'; els.pillPF.className='pill'; els.scoreRaw.textContent='0/'+state.order.length; els.scorePct.textContent='0%';
+    setMeta('Imported question bank ('+state.bank.length+' questions).');
+    // Always save the imported bank to the session only (per-tab)
+    saveSession();
+    // Mirror to localStorage only if user opted in
+    if (state.settings.autosave) saveState();
+  }catch(e){
+    alert('Import failed: '+ e.message);
+  }
+}
+
+/* ===========================
+   EVENT WIRING
+   =========================== */
+els.chkShuffle.addEventListener('change', ()=>{
+  state.settings.shuffle = els.chkShuffle.checked; saveIfEnabled();
+});
+els.chkInstant.addEventListener('change', ()=>{
+  state.settings.instant = els.chkInstant.checked; saveIfEnabled();
+});
+els.chkShowCorrect.addEventListener('change', ()=>{
+  state.settings.showCorrectAfterSubmit = els.chkShowCorrect.checked; saveIfEnabled();
+});
+els.chkAutosave.addEventListener('change', ()=>{
+  state.settings.autosave = els.chkAutosave.checked;
+  // Do not auto-save right away; honour user choice from now on.
+  saveSession(); // session is always maintained
+});
+
+els.btnStart.addEventListener('click', ()=>{
+  state.order = buildOrder();
+  state.answers = {};
+  state.graded = false;
+  state.perQuestionCorrect = {};
+  render();
+  els.pillPF.textContent='—'; els.pillPF.className='pill'; els.scoreRaw.textContent='0/'+state.order.length; els.scorePct.textContent='0%';
+  setMeta('Started. Order '+(state.settings.shuffle? 'shuffled.':'fixed.'));
+  saveIfEnabled();
+});
+
+els.btnSubmit.addEventListener('click', submitAll);
+els.btnSave.addEventListener('click', saveState);
+els.btnLoad.addEventListener('click', loadState);
+els.btnExport.addEventListener('click', exportAttempt);
+
+els.fileImport.addEventListener('change', (ev)=>{
+  const f = ev.target.files && ev.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = ()=> importFromJSONText(String(reader.result||''));
+  reader.onerror = ()=> alert('File read failed.');
+  reader.readAsText(f);
+  // reset the input so the same file can be re-imported if needed
+  ev.target.value = '';
+});
+
+els.btnPaste.addEventListener('click', async ()=>{
+  const text = prompt('Paste a JSON array (question bank):');
+  if (text==null) return;
+  importFromJSONText(text);
+});
+
+document.addEventListener('keydown', (e)=>{
+  const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+  const typing = (tag==='input' || tag==='textarea' || e.isComposing);
+  if (!typing){
+    if (e.key==='s' || e.key==='S'){ e.preventDefault(); submitAll(); }
+    else if (e.key==='r' || e.key==='R'){ e.preventDefault(); els.btnStart.click(); }
+    else if (e.key==='i' || e.key==='I'){ e.preventDefault(); els.btnPaste.click(); }
+    else if (e.key==='j' || e.key==='J'){
+      e.preventDefault();
+      const next = findNextUnansweredIndex();
+      if (next!==-1){
+        const q = state.bank[state.order[next]];
+        const card = document.getElementById('q_'+q.id);
+        if (card) card.scrollIntoView({behavior:'smooth', block:'start'});
+      } else {
+        setMeta('All questions answered.');
+      }
+    }
+  }
+});
+
+function findNextUnansweredIndex(){
+  for (let i=0;i<state.order.length;i++){
+    const q = state.bank[state.order[i]];
+    if (!answeredStatusFor(q)) return i;
+  }
+  return -1;
+}
+
+/* ===========================
+   SELF TESTS (console)
+   =========================== */
+async function selfTests(){
+  try{
+    console.assert(['tf','mc','multi','numeric','matching'].every(s=> typeof s==='string'), 'Type labels are strings.');
+    console.assert(deepEqualSet([0,2],[2,0])===true, 'Set equality works (order independent).');
+    console.assert(deepEqualSet([0,1],[0,1,2])===false, 'Set equality detects different sizes.');
+    const within = (ans, a, t)=> Math.abs(ans-a)<=t;
+    console.assert(within(0.55, 0.55, 0.01), 'Numeric exact within tol.');
+    console.assert(within(0.54, 0.55, 0.01), 'Numeric lower bound ok.');
+    console.assert(within(0.56, 0.55, 0.01), 'Numeric upper bound ok.');
+    const testSpan = document.createElement('span');
+    testSpan.textContent = 'Inline $\\nabla\\cdot \\mathbf{v}=0$ ok.';
+    document.body.appendChild(testSpan);
+    if (window.MathJax && MathJax.typesetPromise){
+      await MathJax.typesetPromise([testSpan]);
+      const ok = !!testSpan.querySelector('svg');
+      console.assert(ok, 'MathJax typeset produced SVG.');
+    } else {
+      console.warn('MathJax not ready for self-test (will be ready shortly).');
+    }
+    testSpan.remove();
+    console.log('Self-tests completed.');
+  }catch(e){
+    console.error('Self-tests error:', e);
+  }
+}
+
+/* ===========================
+   INIT
+   =========================== */
+function init(){
+  els.chkShuffle.checked = state.settings.shuffle;
+  els.chkInstant.checked = state.settings.instant;
+  els.chkShowCorrect.checked = state.settings.showCorrectAfterSubmit;
+  els.chkAutosave.checked = state.settings.autosave;
+
+  // Try to restore from this tab’s session; otherwise start fresh.
+  const restored = loadSessionIfAny();
+  if (!restored){
+    state.order = buildOrder();
+    render();
+    els.pillPF.textContent='—'; els.pillPF.className='pill';
+    els.scoreRaw.textContent='0/'+state.order.length; els.scorePct.textContent='0%';
+  }
+
+  selfTests();
+}
+
+window.addEventListener('load', init);
+
+</script>
+</body>
+</html>
